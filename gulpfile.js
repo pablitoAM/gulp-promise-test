@@ -1,13 +1,13 @@
-const gulp      = require('gulp');
-const fs        = require('fs');
-const transform = require('./transform');
-const merge     = require('./merge');
+const gulp              = require('gulp');
+const streamToPromise   = require('stream-to-promise');
+const transform         = require('./transform');
+const merge             = require('./merge');
 
 function promise(){
     return new Promise((resolve, reject) => {
-        console.log("Checking for inputs...");
+        console.log('Checking for inputs...');
         setTimeout(function(){
-            let result = ['1','3','2'];
+            let result = ['1','5','6', '7', '8'];
             console.log(`Found ${result.length} inputs.`);
             resolve(result);
         }, 2000);
@@ -15,27 +15,42 @@ function promise(){
 }
 
 gulp.task('promise', function(){
-    let val = promise();
-    return val;
+    return promise()
+    .then(val => console.log('Val: ', val))
+    .catch(console.error);
 });
-
-function stream(val, result){
-    return new Promise((resolve, reject) => 
-        gulp.src('data/*.js')
-        //.pipe(debug())
-        .pipe(transform())
-        .pipe(merge(val, result))
-        .on('end', resolve(result.length))
-    );
-}
 
 gulp.task('stream', function(){
-    promise()
-    .then(val => stream(val, {}))
-    .then(result => console.log("Finished: ", result))
-    .catch(console.error);    
+    let val     = ['1', '4', '3'];
+    let result  = [];
+
+    gulp.src('data/*.js')
+        .pipe(transform())
+        .pipe(merge(val))
+        .on('data', (chunk) => result.push(chunk))
+        .on('end', function(){
+            console.log('Transformed and Filtered: ', result);
+        });
+
 });
 
-gulp.task('default', function(){
+gulp.task('all', function(){
 
-});
+    let result = [];
+    return promise()
+    .then(val => {
+        return streamToPromise(
+            gulp.src('data/*.js')
+                .pipe(transform())
+                .pipe(merge(val))
+                .on('data', (chunk) => result.push(chunk))
+                .on('end', function(){
+                    console.log('Transformed and Filtered: ', result);
+                })
+        );
+    })
+    .then(result => {
+        console.log('Final: ', result);
+        return result;
+    }).catch(console.error);
+})

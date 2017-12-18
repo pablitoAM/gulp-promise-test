@@ -1,18 +1,14 @@
 {
   "name": "gulp-promise-test",
   "version": "1.0.0",
-  "description": "A simple gulp pipeline test with promises",
+  "description": "Gulp Stream with Promises",
   "main": "gulpfile.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
+  "author": "PablitoAM",
+  "url" : "http://pabloam.com",
   "license": "ISC",
-  "devDependencies": {
-    "gulp-debug": "^3.1.0"
-  },
   "dependencies": {
     "gulp": "3.9.1",
+    "stream-to-promise": "2.2.0",
     "through2": "2.0.3"
   }
 }
